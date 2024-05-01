@@ -31,7 +31,11 @@ func newKafkaFailureProducerWithDefaults(cfg *config.Config, fch <-chan model.Fa
 	var err error
 
 	for i := 0; i < maxConnectionAttempts; i++ {
-		sp, err = sarama.NewSyncProducer(cfg.Host, config.NewSaramaConfig(cfg.TLSEnable, cfg.TLSSkipVerifyPeer))
+		host := cfg.Host
+		if len(cfg.RetryHost) > 0 {
+			host = cfg.RetryHost
+		}
+		sp, err = sarama.NewSyncProducer(host, config.NewSaramaConfig(cfg.TLSEnable, cfg.TLSSkipVerifyPeer))
 		if err == nil {
 			break
 		}

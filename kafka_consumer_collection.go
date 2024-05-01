@@ -58,6 +58,10 @@ func (cc *kafkaConsumerCollection) start(ctx context.Context, wg *sync.WaitGroup
 	}
 
 	for _, t := range topics {
+		if !t.IsMainTopic && len(cc.cfg.RetryHost) > 0 {
+			cc.cfg.Host = cc.cfg.RetryHost
+		}
+
 		group, err := cc.startConsumerGroup(ctx, wg, t)
 		if err != nil {
 			return err

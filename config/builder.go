@@ -4,6 +4,7 @@ import "time"
 
 type Builder struct {
 	kafkaHost           []string
+	retryKafkaHost      []string
 	kafkaGroup          string
 	sourceTopics        []string
 	retryIntervals      []int
@@ -31,6 +32,11 @@ func NewBuilder() *Builder {
 
 func (cb *Builder) SetKafkaHost(host []string) *Builder {
 	cb.kafkaHost = host
+	return cb
+}
+
+func (cb *Builder) SetRetryKafkaHost(host []string) *Builder {
+	cb.retryKafkaHost = host
 	return cb
 }
 
