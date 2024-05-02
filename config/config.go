@@ -18,6 +18,7 @@ var (
 
 type Config struct {
 	Host             []string
+	RetryHost        []string
 	Group            string
 	ConsumableTopics []*KafkaTopic
 	TopicMap         map[TopicKey]*KafkaTopic
@@ -35,10 +36,11 @@ type Config struct {
 }
 
 type KafkaTopic struct {
-	Name  string
-	Delay time.Duration
-	Key   TopicKey
-	Next  *KafkaTopic
+	Name        string
+	Delay       time.Duration
+	Key         TopicKey
+	Next        *KafkaTopic
+	IsMainTopic bool
 }
 
 type Database struct {
@@ -126,8 +128,9 @@ func (cfg *Config) addTopicsFromSource(topics []string, retryIntervals []int) er
 		// main topic
 		derivedTopics := []*KafkaTopic{
 			{
-				Name: topic,
-				Key:  TopicKey(topic),
+				Name:        topic,
+				Key:         TopicKey(topic),
+				IsMainTopic: true,
 			},
 		}
 		cfg.DBRetries[topic] = []*DBTopicRetry{}
@@ -202,6 +205,7 @@ func (cfg *Config) addTopics(topics []*KafkaTopic) {
 
 func (cfg *Config) loadFromBuilder(b *Builder) error {
 	cfg.Host = b.kafkaHost
+	cfg.RetryHost = b.retryKafkaHost
 	cfg.Group = b.kafkaGroup
 	cfg.TLSEnable = b.tlsEnable
 	cfg.TLSSkipVerifyPeer = b.tlsSkipVerifyPeer
